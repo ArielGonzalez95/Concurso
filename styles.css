@@ -117,7 +117,24 @@ button:disabled {
   background: #555;
   cursor: not-allowed;
 }
+.btn-archivo {
+  display: inline-block;
+  background-color: #ff0000;      /* rojo como tus botones */
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: 'Creepster', cursive;
+  font-size: 1em;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px #000;
+  transition: transform 0.2s, background 0.2s;
+}
 
+.btn-archivo:hover {
+  background-color: #cc0000;
+  transform: scale(1.05);
+}
 /* Inputs */
 input[type="text"] {
   padding: 10px;
