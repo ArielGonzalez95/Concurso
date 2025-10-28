@@ -1,0 +1,175 @@
+/* General */
+body {
+  font-family: 'Creepster', cursive, Arial, sans-serif;
+  background-color: #000;
+  color: #ff7518;
+  text-align: center;
+  padding: 20px;
+  margin: 0;
+}
+
+/* Título principal */
+h1 {
+  font-size: 2.5em;
+  color: #ff0000;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 5px #333;
+}
+
+/* Galería de participantes */
+#galeria {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+  justify-items: center;
+}
+
+/* Tarjeta de participante */
+.participante {
+  background: #111;
+  border: 2px solid #ff7518;
+  border-radius: 10px;
+  padding: 10px;
+  width: 100%;
+  max-width: 200px;
+  box-shadow: 0 2px 6px rgba(255, 117, 24, 0.5);
+  text-align: center;
+  position: relative;
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+.participante:hover {
+  transform: scale(1.05);
+}
+
+/* Imagen del participante */
+.participante img {
+  width: 100%;
+  height: auto;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+/* Selección de voto */
+.participante.seleccionado img {
+  border: 3px solid #28a745;
+}
+
+.participante.no-seleccionado img {
+  opacity: 0.5;
+}
+
+.check-tilde {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 25px;
+  height: 25px;
+  background: #28a745;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 16px;
+}
+
+/* Botones */
+button {
+  background: #ff0000;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  font-family: 'Creepster', cursive;
+  text-shadow: 1px 1px 2px #000;
+  margin-top: 10px;
+  font-size: 1em;
+}
+
+button:disabled {
+  background: #555;
+  cursor: not-allowed;
+}
+
+/* Inputs */
+input[type="text"] {
+  padding: 10px;
+  border-radius: 5px;
+  border: 2px solid #ff7518;
+  margin-bottom: 10px;
+  width: 80%;
+  max-width: 250px;
+  font-size: 1em;
+}
+
+/* Video y preview */
+video, img {
+  width: 90%;
+  max-width: 300px;
+  border-radius: 12px;
+  margin: 10px 0;
+}
+
+/* Opciones de foto */
+#opciones-foto {
+  margin-bottom: 15px;
+}
+
+/* Gráfico */
+#grafico {
+  max-width: 90%;
+  margin: 0 auto 20px;
+}
+
+/* Footer */
+footer {
+  margin-top: 20px;
+  font-size: 1.2em;
+  color: #ff0000;
+  text-shadow: 2px 2px 4px #333;
+}
+
+/* Media Queries */
+@media (max-width: 600px) {
+  h1 {
+    font-size: 2em;
+  }
+
+  button {
+    padding: 8px 15px;
+    font-size: 0.9em;
+  }
+
+  input[type="text"] {
+    font-size: 0.9em;
+  }
+}
+
+@media (max-width: 400px) {
+  h1 {
+    font-size: 1.8em;
+  }
+
+  button {
+    padding: 6px 12px;
+    font-size: 0.85em;
+  }
+
+  input[type="text"] {
+    font-size: 0.85em;
+  }
+
+  .participante {
+    max-width: 150px;
+  }
+
+  video, img {
+    max-width: 90%;
+  }
+}
