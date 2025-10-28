@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RIP Twentie 💀🪦</title>
 <link rel="stylesheet" href="styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
+
 </head>
 <body>
 <h1>RIP Twentie 💀🪦</h1>
@@ -14,17 +16,31 @@
 
   <div id="opciones-foto">
     <button type="button" id="usar-camara">📸 Usar cámara</button>
-    <button type="button" id="cambiar-camara">🔄 Cambiar cámara</button>
     <input type="file" id="subir-foto" accept="image/*" capture="environment" style="display:none;">
     <label for="subir-foto" class="btn-archivo">📁 Subir foto</label>
   </div>
 
-  <video id="camara" autoplay playsinline style="display:none; border-radius:12px;"></video>
+  <!-- Contenedor de la cámara -->
+  <div id="camara-container" style="display:none; position:relative; margin-top:10px; max-width:300px;">
+  <video id="camara" autoplay playsinline style="width:100%; border-radius:12px;"></video>
+  <button type="button" id="cambiar-camara" style="
+    position:absolute;
+    top:10px;
+    right:10px;
+    background: rgba(255,0,0,0.8);
+    color:#fff;
+    border:none;
+    border-radius:50%;
+    padding:8px;
+    font-size:1.2em;
+    cursor:pointer;
+  ">🔄</button>
+</div>
   <canvas id="fotoCanvas" style="display:none;"></canvas>
-  <img id="preview" src="" alt="Previsualización" style="display:none; border-radius:12px; margin-top:10px;">
+  <img id="preview" src="" alt="Previsualización" style="display:none; border-radius:12px; margin-top:10px; width:90%; max-width:300px;">
 
-  <button type="button" id="btn-capturar" style="display:none;">Tomar foto</button>
-  <button type="submit">Enviar Inscripción</button>
+  <button type="button" id="btn-capturar" style="display:none; margin-top:10px;">Tomar foto</button>
+  <button type="submit" style="margin-top:15px;">Enviar Inscripción</button>
 </form>
 
 <div id="mensaje" style="margin-top:15px; font-size:1.2em; font-weight:bold;"></div>

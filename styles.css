@@ -44,17 +44,38 @@ h1 {
 }
 
 /* Imagen del participante */
-.participante img {
-  width: 100%;
-  height: auto;
-  max-height: 200px;
-  object-fit: cover;
+.participante {
+  background: #111;
+  border: 2px solid #ff7518; /* naranja */
   border-radius: 10px;
+  padding: 10px; /* deja espacio entre borde y contenido */
+  width: 100%;
+  max-width: 200px;
+  box-sizing: border-box; /* importante */
+  box-shadow: 0 2px 6px rgba(255, 117, 24, 0.5);
+  text-align: center;
+  position: relative;
+  transition: transform 0.3s, opacity 0.3s;
 }
 
-/* Selección de voto */
+.participante img {
+  width: 100px;
+  border-radius: 12px;
+  transition: all 0.3s;
+}
+
+/* Foto seleccionada */
 .participante.seleccionado img {
-  border: 3px solid #28a745;
+  transform: scale(1.1);
+  border: 3px solid transparent; /* deja espacio para outline */
+  outline: 3px solid #28a745;  /* verde */
+  box-shadow: 0 0 10px #28a745;
+}
+
+/* Fotos no seleccionadas después de votar */
+.participante.no-seleccionado img {
+  opacity: 0.4;
+  border: none;
 }
 
 .participante.no-seleccionado img {
@@ -172,4 +193,19 @@ footer {
   video, img {
     max-width: 90%;
   }
+ #camara-container {
+  display: flex;
+  justify-content: center; /* centra horizontalmente */
+  align-items: center;     /* centra verticalmente si hay altura */
+  position: relative;
+  margin: 10px auto;       /* centra el contenedor dentro del body */
+  width: 90%;              /* ocupa la mayor parte de la pantalla */
+  max-width: 400px;        /* opcional, no tan pequeño */
+}
+
+#camara-container video {
+  width: 100%;             /* ocupa todo el contenedor */
+  border-radius: 12px;
+  display: block;
+}
 }

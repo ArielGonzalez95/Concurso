@@ -4,54 +4,48 @@ const galeria = document.getElementById('galeria')
 const ctx = document.getElementById('grafico')
 let chart
 
-const seleccionado = localStorage.getItem('voto') // id del participante que votaste
+// Guardamos el participante que ya votó
+const seleccionado = localStorage.getItem('voto')
+
+// Div para mostrar ranking
 const resumen = document.createElement('div')
-resumen.style.marginTop = '15px'
-resumen.style.fontSize = '1em'
-resumen.style.color = '#FFA500'
-resumen.style.fontWeight = 'bold'
+resumen.classList.add('resumen-ranking')
 document.body.appendChild(resumen)
 
+// Cargar participantes
 async function cargarParticipantes() {
   const { data, error } = await supabase.from('participantes').select('*')
   if (error) return console.error(error)
 
-  const dataOrdenada = [...data].sort((a,b)=> b.votos - a.votos)
   galeria.innerHTML = ''
+  const dataOrdenada = [...data].sort((a,b)=> b.votos - a.votos)
 
   dataOrdenada.forEach(p => {
     const div = document.createElement('div')
     div.classList.add('participante')
-    div.style.marginBottom = '15px'
-    div.style.textAlign = 'center'
-    div.style.transition = '0.3s'
-
-    // Si ya votaste, destacamos la foto elegida
-    if (seleccionado) {
-      if (seleccionado === p.id) {
-        div.style.transform = 'scale(1.1)'
-        div.style.border = '3px solid #28a745'
-        div.style.opacity = '1'
-      } else {
-        div.style.opacity = '0.4'
-      }
-    }
 
     div.innerHTML = `
-      <img src="${p.foto_url}" alt="${p.nombre}" style="width:100px; border-radius:12px; display:block; margin:auto;">
-      <p style="font-family:'Creepster', cursive; font-size:1.2em;">${p.nombre}</p>
-      <p style="color:#FFD700; font-size:1em;">${p.votos} votos</p>
-      <button ${seleccionado ? 'disabled' : ''} style="display:block; margin:10px auto; padding:8px 20px; font-size:1em;">Votar</button>
+      <img src="${p.foto_url}" alt="${p.nombre}">
+      <p class="nombre">${p.nombre}</p>
+      <p class="votos">${p.votos} votos</p>
+      <button ${seleccionado ? 'disabled' : ''}>Votar</button>
     `
 
-    if (!seleccionado) {
+    // Si ya votaste, aplicamos clases CSS
+    if (seleccionado) {
+      if (seleccionado === p.id) {
+        div.classList.add('seleccionado')
+      } else {
+        div.classList.add('no-seleccionado')
+      }
+    } else {
+      // Click en imagen para seleccionar antes de votar
       div.querySelector('img').addEventListener('click', () => {
-        // seleccionar foto al tocar
-        const allDivs = document.querySelectorAll('.participante')
-        allDivs.forEach(d => d.style.transform = 'scale(1)')
-        div.style.transform = 'scale(1.1)'
+        document.querySelectorAll('.participante').forEach(d => d.classList.remove('seleccionado'))
+        div.classList.add('seleccionado')
       })
 
+      // Click en botón para votar
       div.querySelector('button').addEventListener('click', () => votar(p.id))
     }
 
@@ -62,22 +56,27 @@ async function cargarParticipantes() {
   mostrarResumen(dataOrdenada)
 }
 
+// Función para votar
 async function votar(id) {
   if (localStorage.getItem('voto')) {
     alert('Ya votaste!')
     return
   }
+
   const { error } = await supabase.rpc('incrementar_voto', { participante_id: id })
   if (error) return alert('Error al votar: ' + error.message)
+
   localStorage.setItem('voto', id)
   alert('✅ Tu voto se registró. Gracias por participar!')
   cargarParticipantes()
 }
 
+// Gráfico de torta
 function mostrarGrafico(data) {
   const nombres = data.map(p => p.nombre)
   const votos = data.map(p => p.votos)
   const colores = data.map((_, i) => `hsl(${i * 60}, 80%, 50%)`)
+
   if (chart) chart.destroy()
   chart = new Chart(ctx, {
     type: 'pie',
@@ -86,12 +85,15 @@ function mostrarGrafico(data) {
   })
 }
 
+// Mostrar ranking y empates
 function mostrarResumen(data) {
   if (!data || data.length === 0) return
+
   let texto = ''
   let posiciones = []
   let currentVotos = null
   let pos = 1
+
   for (let i = 0; i < data.length && i < 3; i++) {
     const p = data[i]
     if (currentVotos === null || p.votos < currentVotos) {
@@ -113,4 +115,5 @@ function mostrarResumen(data) {
   resumen.innerHTML = texto
 }
 
+// Ejecutamos
 cargarParticipantes()
