@@ -2,36 +2,52 @@ import { supabase } from './supabaseClient.js'
 
 const galeria = document.getElementById('galeria')
 
-// 🦴 Spinner overlay (calavera giratoria)
-const overlay = document.createElement('div')
-overlay.id = 'overlay-spinner'
+// 💀 Overlay (calavera giratoria)
+function crearOverlay() {
+  let overlay = document.getElementById('overlay')
+  if (!overlay) {
+    overlay = document.createElement('div')
+    overlay.id = 'overlay'
+    overlay.style.position = 'fixed'
+    overlay.style.top = '0'
+    overlay.style.left = '0'
+    overlay.style.width = '100%'
+    overlay.style.height = '100%'
+    overlay.style.background = 'rgba(0, 0, 0, 0.8)'
+    overlay.style.display = 'flex'
+    overlay.style.alignItems = 'center'
+    overlay.style.justifyContent = 'center'
+    overlay.style.zIndex = '9999'
+    overlay.style.color = '#ff0000'
+    overlay.style.fontSize = '80px'
+
+    // 💀 Calavera giratoria
+    overlay.innerHTML = `<div class="spinner-skull">💀</div>`
+    document.body.appendChild(overlay)
+
+    // Animación CSS
+    const style = document.createElement('style')
+    style.innerHTML = `
+      @keyframes girar {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      .spinner-skull {
+        display: inline-block;
+        animation: girar 1s linear infinite;
+      }
+    `
+    document.head.appendChild(style)
+  }
+  return overlay
+}
+
+const overlay = crearOverlay()
 overlay.style.display = 'none'
-overlay.style.position = 'fixed'
-overlay.style.top = '0'
-overlay.style.left = '0'
-overlay.style.width = '100%'
-overlay.style.height = '100%'
-overlay.style.background = 'rgba(0,0,0,0.8)'
-overlay.style.justifyContent = 'center'
-overlay.style.alignItems = 'center'
-overlay.style.zIndex = '9999'
-overlay.innerHTML = `
-  <div class="spinner" style="
-    width:80px; height:80px;
-    background:url('https://i.imgur.com/yourSkullIcon.png') no-repeat center center;
-    background-size:contain;
-    animation:girar 1s linear infinite;">
-  </div>`
-document.body.appendChild(overlay)
 
 // 🔁 Estilos dinámicos
 const style = document.createElement('style')
 style.innerHTML = `
-@keyframes girar {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
 .participante {
   display:inline-block;
   text-align:center;
@@ -47,11 +63,11 @@ style.innerHTML = `
   object-fit:cover;
   border-radius:10px;
   cursor:pointer;
-  border:3px solid transparent; /* sin borde al inicio */
+  border:3px solid transparent;
   transition: all .3s ease;
 }
 
-/* ✅ Solo borde verde en la imagen seleccionada */
+/* ✅ Borde verde solo en la imagen seleccionada */
 .participante.seleccionado img {
   border-color:#00ff9d;
   box-shadow:0 0 10px #00ff9d;
@@ -82,8 +98,8 @@ style.innerHTML = `
 `
 document.head.appendChild(style)
 
-// 🧠 Estado: quién votó
-const seleccionado = localStorage.getItem('voto')
+// 🧠 Estado de voto
+let seleccionado = localStorage.getItem('voto')
 
 // 💬 Mensaje de confirmación
 const mensajeDiv = document.createElement('div')
@@ -109,7 +125,6 @@ async function cargarParticipantes() {
   dataOrdenada.forEach(p => {
     const div = document.createElement('div')
     div.classList.add('participante')
-
     div.innerHTML = `
       <img src="${p.foto_url}" alt="${p.nombre}">
       <p class="nombre">${p.nombre}</p>
@@ -119,7 +134,6 @@ async function cargarParticipantes() {
     const img = div.querySelector('img')
     const btn = div.querySelector('button')
 
-    // Si ya votó → marcar solo la imagen elegida
     if (seleccionado) {
       if (seleccionado === p.id.toString()) {
         div.classList.add('seleccionado')
@@ -127,14 +141,12 @@ async function cargarParticipantes() {
         div.classList.add('no-seleccionado')
       }
     } else {
-      // Click en imagen → selecciona visualmente
       img.addEventListener('click', () => {
         document.querySelectorAll('.participante').forEach(d => d.classList.remove('seleccionado'))
         div.classList.add('seleccionado')
       })
 
-      // Click en botón → votar
-      btn.addEventListener('click', () => votar(p.id))
+      btn.addEventListener('click', () => votar(p.id, div))
     }
 
     galeria.appendChild(div)
@@ -142,22 +154,45 @@ async function cargarParticipantes() {
 }
 
 // 🗳️ Función para votar
-async function votar(id) {
+async function votar(id, div) {
   if (localStorage.getItem('voto')) {
     mostrarMensaje('Ya votaste!')
     return
   }
 
+  // Bloquear temporalmente la galería
+  document.querySelectorAll('.participante').forEach(d => {
+    const img = d.querySelector('img')
+    const btn = d.querySelector('button')
+    if (d !== div) {
+      d.classList.add('no-seleccionado')
+    } else {
+      d.classList.add('seleccionado')
+    }
+    img.style.pointerEvents = 'none'
+    btn.disabled = true
+  })
+
   overlay.style.display = 'flex'
+
   try {
     const { error } = await supabase.rpc('incrementar_voto', { participante_id: id })
     if (error) throw error
 
     localStorage.setItem('voto', id)
+    seleccionado = id.toString()
     mostrarMensaje('✅ Tu voto se registró. ¡Gracias por participar!')
     await cargarParticipantes()
   } catch (err) {
     mostrarMensaje('❌ Error al votar: ' + err.message)
+    // Revertir si falla
+    document.querySelectorAll('.participante').forEach(d => {
+      d.classList.remove('seleccionado', 'no-seleccionado')
+      const img = d.querySelector('img')
+      const btn = d.querySelector('button')
+      img.style.pointerEvents = 'auto'
+      btn.disabled = false
+    })
   } finally {
     overlay.style.display = 'none'
   }
