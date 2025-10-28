@@ -23,6 +23,47 @@ inputArchivo.addEventListener('change', (e) => {
   }
 })
 
+// Crear overlay global (solo una vez)
+function crearOverlay() {
+  let overlay = document.getElementById('overlay')
+  if (!overlay) {
+    overlay = document.createElement('div')
+    overlay.id = 'overlay'
+    overlay.style.position = 'fixed'
+    overlay.style.top = '0'
+    overlay.style.left = '0'
+    overlay.style.width = '100%'
+    overlay.style.height = '100%'
+    overlay.style.background = 'rgba(0, 0, 0, 0.8)'
+    overlay.style.display = 'flex'
+    overlay.style.alignItems = 'center'
+    overlay.style.justifyContent = 'center'
+    overlay.style.zIndex = '9999'
+    overlay.style.color = '#ff0000'
+    overlay.style.fontSize = '60px'
+
+    // Calavera giratoria
+    overlay.innerHTML = `<div class="spinner-skull">💀</div>`
+
+    document.body.appendChild(overlay)
+
+    // Inyectamos estilo de animación
+    const style = document.createElement('style')
+    style.innerHTML = `
+      @keyframes girar {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+      }
+      .spinner-skull {
+        display: inline-block;
+        animation: girar 1s linear infinite;
+      }
+    `
+    document.head.appendChild(style)
+  }
+  return overlay
+}
+
 // Enviar formulario
 form.addEventListener('submit', async (e) => {
   e.preventDefault()
@@ -31,13 +72,20 @@ form.addEventListener('submit', async (e) => {
   const nombre = document.getElementById('nombre').value.trim()
   if (!fotoBlob) return alert('Primero seleccioná una foto')
 
+  // Mostrar spinner
+  const overlay = crearOverlay()
+  overlay.style.display = 'flex'
+
   const fileName = `${Date.now()}_${nombre}.jpg`
 
   const { error: uploadError } = await supabase.storage
     .from('disfraces')
     .upload(fileName, fotoBlob, { contentType: 'image/jpeg' })
 
-  if (uploadError) return alert('Error subiendo imagen: ' + uploadError.message)
+  if (uploadError) {
+    overlay.style.display = 'none'
+    return alert('Error subiendo imagen: ' + uploadError.message)
+  }
 
   const { data: publicUrl } = supabase.storage
     .from('disfraces')
@@ -46,6 +94,9 @@ form.addEventListener('submit', async (e) => {
   const { error: insertError } = await supabase
     .from('participantes')
     .insert([{ nombre, foto_url: publicUrl.publicUrl, votos: 0 }])
+
+  // Ocultar spinner
+  overlay.style.display = 'none'
 
   if (insertError) return alert('Error guardando inscripción: ' + insertError.message)
 

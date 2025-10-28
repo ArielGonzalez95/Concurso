@@ -1,24 +1,110 @@
 import { supabase } from './supabaseClient.js'
 
 const galeria = document.getElementById('galeria')
-const ctx = document.getElementById('grafico')
-let chart
 
-// Guardamos el participante que ya votó
+// 🦴 Spinner overlay (calavera giratoria)
+const overlay = document.createElement('div')
+overlay.id = 'overlay-spinner'
+overlay.style.display = 'none'
+overlay.style.position = 'fixed'
+overlay.style.top = '0'
+overlay.style.left = '0'
+overlay.style.width = '100%'
+overlay.style.height = '100%'
+overlay.style.background = 'rgba(0,0,0,0.8)'
+overlay.style.justifyContent = 'center'
+overlay.style.alignItems = 'center'
+overlay.style.zIndex = '9999'
+overlay.innerHTML = `
+  <div class="spinner" style="
+    width:80px; height:80px;
+    background:url('https://i.imgur.com/yourSkullIcon.png') no-repeat center center;
+    background-size:contain;
+    animation:girar 1s linear infinite;">
+  </div>`
+document.body.appendChild(overlay)
+
+// 🔁 Estilos dinámicos
+const style = document.createElement('style')
+style.innerHTML = `
+@keyframes girar {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.participante {
+  display:inline-block;
+  text-align:center;
+  margin:15px;
+  border:none;
+  border-radius:10px;
+  transition:all .3s;
+}
+
+.participante img {
+  width:160px;
+  height:160px;
+  object-fit:cover;
+  border-radius:10px;
+  cursor:pointer;
+  border:3px solid transparent; /* sin borde al inicio */
+  transition: all .3s ease;
+}
+
+/* ✅ Solo borde verde en la imagen seleccionada */
+.participante.seleccionado img {
+  border-color:#00ff9d;
+  box-shadow:0 0 10px #00ff9d;
+}
+
+/* 🔇 Los no seleccionados se apagan */
+.participante.no-seleccionado img {
+  opacity:0.4;
+  filter:grayscale(100%);
+}
+
+.participante button {
+  margin-top:8px;
+  padding:6px 12px;
+  border:none;
+  border-radius:6px;
+  background:#3a5dae;
+  color:white;
+  cursor:pointer;
+  transition:all .3s;
+  font-family:'Creepster', cursive;
+}
+
+.participante button:disabled {
+  background:#999;
+  cursor:not-allowed;
+}
+`
+document.head.appendChild(style)
+
+// 🧠 Estado: quién votó
 const seleccionado = localStorage.getItem('voto')
 
-// Div para mostrar ranking
-const resumen = document.createElement('div')
-resumen.classList.add('resumen-ranking')
-document.body.appendChild(resumen)
+// 💬 Mensaje de confirmación
+const mensajeDiv = document.createElement('div')
+mensajeDiv.id = 'mensaje'
+mensajeDiv.style.marginTop = '15px'
+mensajeDiv.style.fontSize = '1.2em'
+mensajeDiv.style.fontWeight = 'bold'
+mensajeDiv.style.textAlign = 'center'
+document.body.appendChild(mensajeDiv)
 
-// Cargar participantes
+function mostrarMensaje(texto) {
+  mensajeDiv.innerHTML = texto
+}
+
+// 👻 Cargar participantes
 async function cargarParticipantes() {
   const { data, error } = await supabase.from('participantes').select('*')
   if (error) return console.error(error)
 
   galeria.innerHTML = ''
-  const dataOrdenada = [...data].sort((a,b)=> b.votos - a.votos)
+  const dataOrdenada = [...data].sort((a, b) => a.nombre.localeCompare(b.nombre))
 
   dataOrdenada.forEach(p => {
     const div = document.createElement('div')
@@ -27,93 +113,55 @@ async function cargarParticipantes() {
     div.innerHTML = `
       <img src="${p.foto_url}" alt="${p.nombre}">
       <p class="nombre">${p.nombre}</p>
-      <p class="votos">${p.votos} votos</p>
       <button ${seleccionado ? 'disabled' : ''}>Votar</button>
     `
 
-    // Si ya votaste, aplicamos clases CSS
+    const img = div.querySelector('img')
+    const btn = div.querySelector('button')
+
+    // Si ya votó → marcar solo la imagen elegida
     if (seleccionado) {
-      if (seleccionado === p.id) {
+      if (seleccionado === p.id.toString()) {
         div.classList.add('seleccionado')
       } else {
         div.classList.add('no-seleccionado')
       }
     } else {
-      // Click en imagen para seleccionar antes de votar
-      div.querySelector('img').addEventListener('click', () => {
+      // Click en imagen → selecciona visualmente
+      img.addEventListener('click', () => {
         document.querySelectorAll('.participante').forEach(d => d.classList.remove('seleccionado'))
         div.classList.add('seleccionado')
       })
 
-      // Click en botón para votar
-      div.querySelector('button').addEventListener('click', () => votar(p.id))
+      // Click en botón → votar
+      btn.addEventListener('click', () => votar(p.id))
     }
 
     galeria.appendChild(div)
   })
-
-  mostrarGrafico(dataOrdenada)
-  mostrarResumen(dataOrdenada)
 }
 
-// Función para votar
+// 🗳️ Función para votar
 async function votar(id) {
   if (localStorage.getItem('voto')) {
-    alert('Ya votaste!')
+    mostrarMensaje('Ya votaste!')
     return
   }
 
-  const { error } = await supabase.rpc('incrementar_voto', { participante_id: id })
-  if (error) return alert('Error al votar: ' + error.message)
+  overlay.style.display = 'flex'
+  try {
+    const { error } = await supabase.rpc('incrementar_voto', { participante_id: id })
+    if (error) throw error
 
-  localStorage.setItem('voto', id)
-  alert('✅ Tu voto se registró. Gracias por participar!')
-  cargarParticipantes()
-}
-
-// Gráfico de torta
-function mostrarGrafico(data) {
-  const nombres = data.map(p => p.nombre)
-  const votos = data.map(p => p.votos)
-  const colores = data.map((_, i) => `hsl(${i * 60}, 80%, 50%)`)
-
-  if (chart) chart.destroy()
-  chart = new Chart(ctx, {
-    type: 'pie',
-    data: { labels: nombres, datasets: [{ data: votos, backgroundColor: colores }] },
-    options: { responsive:true }
-  })
-}
-
-// Mostrar ranking y empates
-function mostrarResumen(data) {
-  if (!data || data.length === 0) return
-
-  let texto = ''
-  let posiciones = []
-  let currentVotos = null
-  let pos = 1
-
-  for (let i = 0; i < data.length && i < 3; i++) {
-    const p = data[i]
-    if (currentVotos === null || p.votos < currentVotos) {
-      currentVotos = p.votos
-      posiciones.push({ pos, participantes: [p] })
-      pos++
-    } else if (p.votos === currentVotos) {
-      posiciones[posiciones.length - 1].participantes.push(p)
-    }
+    localStorage.setItem('voto', id)
+    mostrarMensaje('✅ Tu voto se registró. ¡Gracias por participar!')
+    await cargarParticipantes()
+  } catch (err) {
+    mostrarMensaje('❌ Error al votar: ' + err.message)
+  } finally {
+    overlay.style.display = 'none'
   }
-
-  posiciones.forEach(grupo => {
-    const emojis = ['🏆','🥈','🥉']
-    const emoji = emojis[grupo.pos - 1] || ''
-    const nombres = grupo.participantes.map(p => `${p.nombre} (${p.votos} votos)`).join(' y ')
-    texto += `${emoji} ${nombres}<br>`
-  })
-
-  resumen.innerHTML = texto
 }
 
-// Ejecutamos
+// 🚀 Iniciar
 cargarParticipantes()
