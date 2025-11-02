@@ -3,68 +3,138 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Resultados del concurso</title>
-  <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
-  <script type="module" src="./resultados.js"></script>
+  <title>RIP 20 - Concurso Finalizado</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;600&family=UnifrakturCook:wght@700&display=swap');
+
     body {
-      background: #000;
-      color: #fff;
-      font-family: 'Creepster', cursive;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      background: radial-gradient(circle at bottom, #0a0a0a 0%, #1c1c1c 100%);
+      color: #f5f5f5;
+      font-family: 'Roboto Slab', serif;
+      overflow-y: auto; /* 🔹 permite scroll si hay mucho contenido */
+    }
+
+    .container {
       text-align: center;
-      padding: 30px;
+      background: rgba(30, 30, 30, 0.85);
+      padding: 40px 30px 60px 30px;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(150, 150, 150, 0.15);
+      position: relative;
+      z-index: 2;
+      max-width: 700px;
+      margin: 60px 20px; /* 🔹 margen superior para no quedar pegado arriba */
     }
 
     h1 {
-      color: #00ff9d;
-      font-size: 2.2em;
-      margin-bottom: 40px;
+      font-family: 'UnifrakturCook', cursive;
+      font-size: 3rem;
+      margin: 0;
+      color: #9c8cd4;
+      text-shadow: 0 0 15px rgba(156, 140, 212, 0.5);
     }
 
-    #top3 {
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 40px;
+    p {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      color: #dcdcdc;
     }
 
-    .participante {
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
+    .tombstone {
+      font-size: 4rem;
+      margin-bottom: 10px;
+      color: #9c8cd4;
+      text-shadow: 0 0 10px rgba(156, 140, 212, 0.4);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .photos {
+      margin-top: 35px;
       padding: 15px;
-      width: 180px;
+      border: 3px solid #27c75f;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(39, 199, 95, 0.3);
+      background-color: rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .photo {
       text-align: center;
-      box-shadow: 0 0 10px #00ff9d44;
-      transition: transform .3s;
+      width: 100%;
+      max-width: 400px;
     }
 
-    .participante:hover {
-      transform: scale(1.05);
-    }
-
-    .participante img {
-      width: 150px;
-      height: 150px;
-      object-fit: cover;
+    .photo img {
+      width: 100%;
+      height: auto;
       border-radius: 10px;
-      border: 3px solid #00ff9d;
+      display: block;
+      margin-bottom: 10px;
+      box-shadow: 0 0 15px rgba(39, 199, 95, 0.4);
     }
 
-    .nombre {
-      margin-top: 10px;
-      font-size: 1.3em;
-      color: #fff;
+    .photo h3 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: #27c75f;
+      text-shadow: 0 0 5px rgba(39, 199, 95, 0.5);
     }
 
-    .votos {
-      margin-top: 6px;
-      font-size: 1.1em;
-      color: #00ff9d;
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
     }
+
+    .fog {
+      position: fixed;
+      width: 200%;
+      height: 200%;
+      top: -50%;
+      left: -50%;
+      background: radial-gradient(circle, rgba(200,200,200,0.1) 0%, rgba(0,0,0,0.8) 80%);
+      animation: fogMove 20s infinite linear;
+      opacity: 0.3;
+      z-index: 1;
+    }
+
+    @keyframes fogMove {
+      from { transform: translateX(0); }
+      to { transform: translateX(50%); }
+    }
+
   </style>
 </head>
 <body>
-  <h1>👑 Top 3 Participantes</h1>
-  <div id="top3"></div>
+  <div class="fog"></div>
+  <div class="container">
+    <div class="tombstone">🪦</div>
+    <h1>RIP 20</h1>
+    <p>El concurso terminó.<br>Podés pedirle tu foto a la cumpleañera 💜</p>
+
+    <div class="photos">
+      <div class="photo">
+        <img src="oli.jpg" alt="1er Puesto - Oli">
+        <h3>🏆 1° Puesto - Oli</h3>
+      </div>
+
+      <div class="photo">
+        <img src="Cony y Exe.jpg" alt="2do Puesto - Cony y Exe">
+        <h3>🥈 2° Puesto - Cony y Exe</h3>
+      </div>
+
+      <div class="photo">
+        <img src="Juliiii.jpg" alt="3er Puesto - Juliiii">
+        <h3>🥉 3° Puesto - Juliiii</h3>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
