@@ -1,34 +1,110 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RIP Twentie 💀🪦</title>
-<link rel="stylesheet" href="styles.css">
-<link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RIP 20 - Concurso Finalizado</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;600&family=UnifrakturCook:wght@700&display=swap');
 
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: radial-gradient(circle at bottom, #0a0a0a 0%, #1c1c1c 100%);
+      color: #f5f5f5;
+      font-family: 'Roboto Slab', serif;
+      overflow: hidden;
+    }
+
+    .container {
+      text-align: center;
+      background: rgba(30, 30, 30, 0.85);
+      padding: 50px 40px;
+      border-radius: 20px;
+      box-shadow: 0 0 30px rgba(150, 150, 150, 0.15);
+      position: relative;
+      z-index: 2;
+      max-width: 550px;
+    }
+
+    h1 {
+      font-family: 'UnifrakturCook', cursive;
+      font-size: 3rem;
+      margin: 0;
+      color: #9c8cd4;
+      text-shadow: 0 0 15px rgba(156, 140, 212, 0.5);
+    }
+
+    p {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      color: #dcdcdc;
+    }
+
+    .tombstone {
+      font-size: 4rem;
+      margin-bottom: 10px;
+      color: #9c8cd4;
+      text-shadow: 0 0 10px rgba(156, 140, 212, 0.4);
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .photo {
+      margin-top: 30px;
+      padding: 10px;
+      border: 3px solid #27c75f;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(39, 199, 95, 0.3);
+      display: inline-block;
+      background-color: rgba(0, 0, 0, 0.3);
+    }
+
+    .photo img {
+      width: 100%;
+      height: auto;
+      max-height: 300px;
+      border-radius: 10px;
+      display: block;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .fog {
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      top: -50%;
+      left: -50%;
+      background: radial-gradient(circle, rgba(200,200,200,0.1) 0%, rgba(0,0,0,0.8) 80%);
+      animation: fogMove 20s infinite linear;
+      opacity: 0.3;
+      z-index: 1;
+    }
+
+    @keyframes fogMove {
+      from { transform: translateX(0); }
+      to { transform: translateX(50%); }
+    }
+
+  </style>
 </head>
 <body>
-<h1>RIP Twentie 💀🪦</h1>
+  <div class="fog"></div>
+  <div class="container">
+    <div class="tombstone">🪦</div>
+    <h1>RIP 20</h1>
+    <p>El concurso terminó.<br>Podés pedirle tu foto a la cumpleañera 💜</p>
 
-<form id="form-inscripcion">
-  <input type="text" id="nombre" placeholder="Tu nombre" required>
-
- <div id="opciones-foto">
-  <input type="file" id="subir-foto" accept="image/*" capture="environment" style="display:none;">
-  <label for="subir-foto" class="btn-archivo">📸 Tomar Foto</label>
-</div>
-
-  <img id="preview" src="" alt="Previsualización" style="display:none; border-radius:12px; margin-top:10px; width:90%; max-width:300px;">
-
-  <button type="submit" style="margin-top:15px;">Enviar Inscripción</button>
-</form>
-
-<div id="mensaje" style="margin-top:15px; font-size:1.2em; font-weight:bold;"></div>
-<div id="overlay-spinner" style="display:none;">
-  <div class="spinner"></div>
-</div>
-<script type="module" src="supabaseClient.js"></script>
-<script type="module" src="participar.js"></script>
+    <div class="photo">
+      <img src="oli.jpg" alt="Foto ganadora - RIP 20">
+    </div>
+  </div>
 </body>
 </html>
